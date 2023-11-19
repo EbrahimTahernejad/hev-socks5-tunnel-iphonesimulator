@@ -7,18 +7,8 @@ PP=$(CROSS_PREFIX)cpp
 CC=$(CROSS_PREFIX)gcc
 AR=$(CROSS_PREFIX)ar
 STRIP=$(CROSS_PREFIX)strip
-CCFLAGS=-O3 -pipe -Wall -Werror $(CFLAGS) \
-		-I$(SRCDIR)/misc \
-		-I$(SRCDIR)/core/include  \
-		-I$(THIRDPARTDIR)/yaml/include \
-		-I$(THIRDPARTDIR)/lwip/include \
-		-I$(THIRDPARTDIR)/lwip/include/ports/unix \
-		-I$(THIRDPARTDIR)/hev-task-system/include
-LDFLAGS=$(LFLAGS) \
-		-L$(THIRDPARTDIR)/yaml/bin -lyaml \
-		-L$(THIRDPARTDIR)/lwip/bin -llwip \
-		-L$(THIRDPARTDIR)/hev-task-system/bin -lhev-task-system \
-		-lpthread
+CCFLAGS=-O3 -pipe -Wall -Werror $(CFLAGS)
+LDFLAGS=$(LFLAGS)
 
 SRCDIR=src
 BINDIR=bin
@@ -65,24 +55,14 @@ ifeq ($(V),1)
 	undefine ECHO_PREFIX
 endif
 
-.PHONY: exec static shared clean install uninstall tp-static tp-shared tp-clean
-
+.PHONY: exec static shared clean install uninstall
 exec : $(EXEC_TARGET)
 
 static : $(STATIC_TARGET)
 
 shared : $(SHARED_TARGET)
 
-tp-static : $(THIRDPARTS)
-	@$(foreach dir,$^,$(MAKE) --no-print-directory -C $(dir) static;)
-
-tp-shared : $(THIRDPARTS)
-	@$(foreach dir,$^,$(MAKE) --no-print-directory -C $(dir) shared;)
-
-tp-clean : $(THIRDPARTS)
-	@$(foreach dir,$^,$(MAKE) --no-print-directory -C $(dir) clean;)
-
-clean : tp-clean
+clean :
 	$(ECHO_PREFIX) $(RM) -rf $(BINDIR) $(BUILDDIR)
 	@printf $(CLEANMSG) $(PROJECT)
 
@@ -104,19 +84,19 @@ $(INSTDIR)/etc/$(PROJECT).yml : $(CONFIG)
 	$(ECHO_PREFIX) install -m 0644 $< $@
 	@printf $(INSTMSG) $< $@
 
-$(EXEC_TARGET) : $(LDOBJS) tp-static
+$(EXEC_TARGET) : $(LDOBJS)
 	$(ECHO_PREFIX) mkdir -p $(dir $@)
 	$(ECHO_PREFIX) $(CC) -o $@ $(LDOBJS) $(LDFLAGS)
 	@printf $(LINKMSG) $@
 	$(ECHO_PREFIX) $(STRIP) $@
 	@printf $(STRIPMSG) $@
 
-$(STATIC_TARGET) : $(LDOBJS) tp-static
+$(STATIC_TARGET) : $(LDOBJS)
 	$(ECHO_PREFIX) mkdir -p $(dir $@)
 	$(ECHO_PREFIX) $(AR) csq $@ $(LDOBJS)
 	@printf $(LINKMSG) $@
 
-$(SHARED_TARGET) : $(LDOBJS) tp-shared
+$(SHARED_TARGET) : $(LDOBJS)
 	$(ECHO_PREFIX) mkdir -p $(dir $@)
 	$(ECHO_PREFIX) $(CC) -o $@ $(LDOBJS) $(LDFLAGS)
 	@printf $(LINKMSG) $@
