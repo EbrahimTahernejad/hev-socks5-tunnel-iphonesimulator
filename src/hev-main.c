@@ -20,3 +20,9 @@ hev_socks5_tunnel_quit (void)
 {
     return;
 }
+
+void hev_socks5_tunnel_stats (size_t *tx_packets, size_t *tx_bytes,
+                              size_t *rx_packets, size_t *rx_bytes)
+{
+    return;
+}
