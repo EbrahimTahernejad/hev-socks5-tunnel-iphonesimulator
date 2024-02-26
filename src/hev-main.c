@@ -15,6 +15,17 @@ hev_socks5_tunnel_main (const char *config_path, int tun_fd)
     return -2;
 }
 
+int hev_socks5_tunnel_main_from_file (const char *config_path, int tun_fd)
+{
+    return -2;
+}
+
+int hev_socks5_tunnel_main_from_str (const unsigned char *config_str,
+                                     unsigned int config_len, int tun_fd)
+{
+    return -2;
+}
+
 void
 hev_socks5_tunnel_quit (void)
 {
